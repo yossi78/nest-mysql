@@ -1,36 +1,51 @@
 import { Column, PrimaryGeneratedColumn, Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './user';
+import { UserEntity } from './user.entity';
+import { CreateUserDto } from './create.user.dto';
+import { toUserEntity } from './user.mapper';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
-  ) { }
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const user = toUserEntity(createUserDto);  // Convert DTO to Entity
+    return this.userRepository.save(user);
+  }
+
+  
 
   findAll(): Promise<UserEntity[]> {
     return this.userRepository.find();
   }
 
-  findOne(id: number): Promise<UserEntity> {
+  findOne(id: string): Promise<UserEntity> {
     return this.userRepository.findOne({
       where: {
         id
       }
     });
   }
+  
 
-  create(user: UserEntity): Promise<UserEntity> {
-    return this.userRepository.save(user);
-  }
 
-  async update(id: number, user: UserEntity) {
+  
+
+  async update(id: string, user: UserEntity) {
     await this.userRepository.update(id, user);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.userRepository.delete(id);
+  async remove(id: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    await this.userRepository.remove(user);
   }
+
+  
 }

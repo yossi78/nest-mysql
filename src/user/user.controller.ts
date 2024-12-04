@@ -1,49 +1,61 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Put,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserEntity } from './user';
+import { CreateUserDto } from '../user/create.user.dto';
 
-@Controller('user')
+
+@Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
+
+  @Post()
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      return await this.userService.create(createUserDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   @Get()
-  async fillAll() {
-    const response = await this.userService.findAll();
-    return response;
-    // res.status(HttpStatus.OK).json({ payload: response });
+  async findAll() {
+    try {
+      return await this.userService.findAll();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
-    const response = await this.userService.findOne(id);
-    return response;
+  async findOne(@Param('id') id: string) {
+    try {
+      const response = await this.userService.findOne(id);
+      return response;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-
-  @Post()
-  async create(@Body() createUserDto: UserEntity) {
-    const response = await this.userService.create(createUserDto);
-    return response;
-  }
+  
+  
 
   @Put(':id')
-  async update(@Param() id: number, @Body() createUserDto: UserEntity) {
-    const response = await this.userService.update(id, createUserDto);
-    return response;
+  async update(@Param('id') id: string, @Body() updateUserDto: CreateUserDto) {
+    try {
+      return await this.userService.update(id, updateUserDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Delete()
-  async delete(@Body() id: number) {
-    const response = await this.userService.remove(id);
-    return response;
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    try {
+      await this.userService.remove(id);
+      return { message: 'User deleted successfully' };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

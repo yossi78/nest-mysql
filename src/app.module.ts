@@ -1,19 +1,31 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { DatabaseModule } from './database/database.module';
-import { ConfigModule } from '@nestjs/config';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './user/user.entity';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { LoggerMiddleware } from './middleware/logger.middleware.';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // Makes .env configuration available globally
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'user',
+      password: 'userpassword',
+      database: 'testdb',
+      entities: [UserEntity],
+      synchronize: true,
     }),
-    DatabaseModule,
+    TypeOrmModule.forFeature([UserEntity]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [UserController],
+  providers: [UserService],
 })
-
-
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: 'users', method: RequestMethod.ALL });
+  }
+}
