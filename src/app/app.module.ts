@@ -1,9 +1,9 @@
 import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './user/user.entity';
-import { UserService } from './user/user.service';
-import { UserController } from './user/user.controller';
-import { LoggerMiddleware } from './middleware/logger.middleware.';
+import { UserEntity } from '../user/user.entity';
+import { UserService } from '../user/user.service';
+import { UserController } from '../user/user.controller';
+import { LoggerMiddleware } from '../middleware/logger.middleware.';
 
 @Module({
   imports: [
