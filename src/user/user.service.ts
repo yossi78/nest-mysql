@@ -17,14 +17,19 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  
-
-  findAll(): Promise<UserEntity[]> {
-    return this.userRepository.find();
+  async update(id: string, updatedUser: UserEntity) {
+    await this.findOne(id);
+    await this.userRepository.update(id, updatedUser);
   }
 
+  async remove(id: string): Promise<void> {
+    const user = await this.findOne(id);
+    await this.userRepository.remove(user);
+  }
 
-   async findOne(id: string): Promise<UserEntity> {
+  
+
+  async findOne(id: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({ where: { id } }) || null;
     if (!user) {
       throw new NotFoundException('User not found');
@@ -32,29 +37,10 @@ export class UserService {
     return user;
   }
 
-
-
-  async update(id: string, updatedUser: UserEntity) {
-    await this.checkUserExistance(id);
-    await this.userRepository.update(id, updatedUser);
+  findAll(): Promise<UserEntity[]> {
+    return this.userRepository.find();
   }
 
-  async remove(id: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    await this.userRepository.remove(user);
-  }
-
-
-  async checkUserExistance(id: string): Promise<void>{
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-  }
-  
 
   
 }
