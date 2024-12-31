@@ -32,17 +32,7 @@ export class UserService {
     return user;
   }
 
-  // oldfindOne(id: string): Promise<UserEntity> {
-  //   return this.userRepository.findOne({
-  //     where: {
-  //       id
-  //     }
-  //   });
-  // }
-  
 
-
-  
 
   async update(id: string, user: UserEntity) {
     await this.userRepository.update(id, user);
