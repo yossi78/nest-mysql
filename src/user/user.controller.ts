@@ -45,6 +45,9 @@ export class UserController {
     try {
       return await this.userService.update(id, updateUserDto);
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
+      }
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -58,4 +61,6 @@ export class UserController {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  
 }

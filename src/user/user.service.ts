@@ -34,8 +34,9 @@ export class UserService {
 
 
 
-  async update(id: string, user: UserEntity) {
-    await this.userRepository.update(id, user);
+  async update(id: string, updatedUser: UserEntity) {
+    await this.checkUserExistance(id);
+    await this.userRepository.update(id, updatedUser);
   }
 
   async remove(id: string): Promise<void> {
@@ -45,6 +46,15 @@ export class UserService {
     }
     await this.userRepository.remove(user);
   }
+
+
+  async checkUserExistance(id: string): Promise<void>{
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+  }
+  
 
   
 }
