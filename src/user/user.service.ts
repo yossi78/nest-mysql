@@ -23,13 +23,22 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  findOne(id: string): Promise<UserEntity> {
-    return this.userRepository.findOne({
-      where: {
-        id
-      }
-    });
+
+   async findOne(id: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } }) || null;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
+
+  // oldfindOne(id: string): Promise<UserEntity> {
+  //   return this.userRepository.findOne({
+  //     where: {
+  //       id
+  //     }
+  //   });
+  // }
   
 
 
