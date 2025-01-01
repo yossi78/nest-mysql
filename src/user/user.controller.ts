@@ -65,5 +65,14 @@ export class UserController {
     }
   }
 
+  @Get('env/variables')
+  getEnvVariables() {
+    try {
+      return this.userService.getEnvVariables();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   
 }
