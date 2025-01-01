@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from '../user/user.entity';
 
 @Module({
   imports: [
@@ -7,15 +8,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'mysql',
       host: 'localhost',
       port: 3306,
-      username: 'mysqluser',
-      password: 'mysqlpassword',
+      username: 'user',
+      password: 'userpassword',
       database: 'testdb',
-      entities: [],
+      entities: [UserEntity],
       synchronize: true,
-      extra: {
-        dialectModule: require('mysql2'), // Add this line if using mysql2
-      },
     }),
+    TypeOrmModule.forFeature([UserEntity]),
   ],
+  exports: [TypeOrmModule],
 })
-export class MysqlModule {}
+export class DatabaseModule {}
