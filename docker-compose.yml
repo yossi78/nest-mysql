@@ -2,9 +2,8 @@ version: '3.8'
 
 services:
   mysql:
-    image: mysql:5.7
-    container_name: mysql_container
-    restart: always
+    image: mysql:8
+    container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: testdb
@@ -13,14 +12,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
-    command: >
-      bash -c "
-      echo 'CREATE DATABASE IF NOT EXISTS testdb;' > /docker-entrypoint-initdb.d/init.sql;
-      echo 'GRANT ALL PRIVILEGES ON testdb.* TO \"mysqluser\"@\"%\" IDENTIFIED BY \"mysqlpassword\";' >> /docker-entrypoint-initdb.d/init.sql;
-      echo 'FLUSH PRIVILEGES;' >> /docker-entrypoint-initdb.d/init.sql;
-      docker-entrypoint.sh mysqld
-      "
+      - mysql-data:/var/lib/mysql
 
 volumes:
-  mysql_data:
+  mysql-data:
